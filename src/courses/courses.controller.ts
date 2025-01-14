@@ -1,13 +1,29 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Put, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiNotFoundResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
 import { CreateCourseDto } from './dto/create.course.dto';
 import { CreateLessonDto } from './dto/create.lesson.dto';
 import { TestSubmissionDto } from './dto/test.dto';
 import { RolesGuard } from 'src/auth/guards/role.guard';
-import { Roles } from 'src/auth/decorators/role.decorator';
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -18,10 +34,13 @@ export class CoursesController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  // @Roles('user')
   @ApiOperation({ summary: 'Create a new course' })
-  createCourse(@Body() createCourseDto: CreateCourseDto) {
-    return this.coursesService.createCourse(createCourseDto);
+  createCourse(@Req() req, @Body() createCourseDto: CreateCourseDto) {
+    console.log(req.user);
+    return this.coursesService.createCourse({
+      ...createCourseDto,
+      author: req.user._id,
+    });
   }
 
   @Get()
@@ -40,7 +59,7 @@ export class CoursesController {
   @ApiOperation({ summary: 'Update course' })
   updateCourse(
     @Param('id') id: string,
-    @Body() updateCourseDto: Partial<CreateCourseDto>
+    @Body() updateCourseDto: Partial<CreateCourseDto>,
   ) {
     return this.coursesService.updateCourse(id, updateCourseDto);
   }
@@ -49,7 +68,7 @@ export class CoursesController {
   @ApiOperation({ summary: 'Add lesson to course' })
   addLesson(
     @Param('courseId') courseId: string,
-    @Body() createLessonDto: CreateLessonDto
+    @Body() createLessonDto: CreateLessonDto,
   ) {
     return this.coursesService.addLesson(courseId, createLessonDto);
   }
@@ -59,9 +78,13 @@ export class CoursesController {
   updateLesson(
     @Param('courseId') courseId: string,
     @Param('lessonId') lessonId: string,
-    @Body() updateLessonDto: Partial<CreateLessonDto>
+    @Body() updateLessonDto: Partial<CreateLessonDto>,
   ) {
-    return this.coursesService.updateLesson(courseId, lessonId, updateLessonDto);
+    return this.coursesService.updateLesson(
+      courseId,
+      lessonId,
+      updateLessonDto,
+    );
   }
 
   @Post(':courseId/lessons/:lessonId/code')
@@ -69,7 +92,7 @@ export class CoursesController {
   evaluateCode(
     @Param('courseId') courseId: string,
     @Param('lessonId') lessonId: string,
-    @Body() submission: { code: string; language: string }
+    @Body() submission: { code: string; language: string },
   ) {
     return this.coursesService.evaluateCode(courseId, lessonId, submission);
   }
@@ -81,8 +104,12 @@ export class CoursesController {
   async evaluateTest(
     @Param('courseId') courseId: string,
     @Param('lessonId') lessonId: string,
-    @Body() submission: TestSubmissionDto
+    @Body() submission: TestSubmissionDto,
   ) {
-    return await this.coursesService.evaluateTest(courseId, lessonId, submission);
+    return await this.coursesService.evaluateTest(
+      courseId,
+      lessonId,
+      submission,
+    );
   }
 }

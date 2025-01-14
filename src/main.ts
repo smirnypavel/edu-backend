@@ -21,13 +21,15 @@ async function start() {
     }),
   );
   app.enableCors();
-  // Настраиваем Swagger
+
   const config = new DocumentBuilder()
     .setTitle('Programming Learning Platform API')
     .setDescription('API documentation for Programming Learning Platform')
     .setVersion('1.0')
     .addTag('auth', 'Authentication endpoints')
-    .addBearerAuth().addServer(`http://localhost:${PORT}`)
+    .addBearerAuth()
+    .addServer(`http://localhost:${PORT}`)
+    .addServer(`https://edu-backend-jub0.onrender.com`)
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -39,7 +39,7 @@ export class Course extends Document {
   lessons: Lesson[];
 
   @ApiProperty({ description: 'Автор курса' })
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   author: MongooseSchema.Types.ObjectId;
 
   @ApiProperty({ description: 'Статус публикации' })
@@ -49,7 +49,6 @@ export class Course extends Document {
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
 
-// Индексы для оптимизации запросов
 CourseSchema.index({ title: 'text', description: 'text' });
 CourseSchema.index({ category: 1, level: 1 });
 CourseSchema.index({ status: 1 });
