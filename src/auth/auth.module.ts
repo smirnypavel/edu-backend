@@ -6,14 +6,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UserSchema } from './schemas/user.schema';
+import { User, UserSchema } from './schemas/user.schema';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { MailModule } from 'src/mail/mail.module';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     PassportModule,
     JwtModule.registerAsync({
       useFactory: () => ({
@@ -22,15 +23,17 @@ import { MailModule } from 'src/mail/mail.module';
       }),
     }),
     ThrottlerModule.forRoot({
-      throttlers: [{
-        limit: 10,
-        ttl: 60000,
-      }],
+      throttlers: [
+        {
+          limit: 10,
+          ttl: 60000,
+        },
+      ],
     }),
     MailModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, GoogleStrategy],
-  exports: [AuthService],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, GoogleStrategy],
+  exports: [JwtAuthGuard, AuthService],
 })
 export class AuthModule {}

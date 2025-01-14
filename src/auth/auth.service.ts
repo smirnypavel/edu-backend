@@ -1,5 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, UnauthorizedException, BadRequestException, Logger, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -24,7 +30,7 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     try {
       const { email, password } = registerDto;
-      
+
       const existingUser = await this.userModel.findOne({ email });
       if (existingUser) {
         throw new BadRequestException('Пользователь уже существует');
@@ -47,7 +53,9 @@ export class AuthService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new InternalServerErrorException('Ошибка при регистрации пользователя');
+      throw new InternalServerErrorException(
+        'Ошибка при регистрации пользователя',
+      );
     }
   }
 
@@ -68,11 +76,11 @@ export class AuthService {
 
       if (!isPasswordValid) {
         user.loginAttempts += 1;
-        
+
         if (user.loginAttempts >= this.MAX_LOGIN_ATTEMPTS) {
           user.lockUntil = new Date(Date.now() + this.LOCK_TIME);
         }
-        
+
         await user.save();
         throw new UnauthorizedException('Неверные учетные данные');
       }
@@ -81,7 +89,10 @@ export class AuthService {
       user.lockUntil = undefined;
       await user.save();
 
-      const token = this.jwtService.sign({ userId: user._id, email: user.email });
+      const token = this.jwtService.sign({
+        userId: user._id,
+        email: user.email,
+      });
 
       return {
         access_token: token,
@@ -103,7 +114,7 @@ export class AuthService {
   async googleLogin(profile: any) {
     try {
       const { email, googleId } = profile;
-      
+
       let user = await this.userModel.findOne({ email });
 
       if (!user) {
@@ -116,8 +127,16 @@ export class AuthService {
         });
         await user.save();
       }
-
-      const token = this.jwtService.sign({ userId: user._id, email: user.email });
+      await this.userModel.updateOne(
+        { email },
+        {
+          googleId,
+        },
+      );
+      const token = this.jwtService.sign({
+        userId: user._id,
+        email: user.email,
+      });
 
       return {
         access_token: token,
@@ -155,25 +174,29 @@ export class AuthService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new InternalServerErrorException('Ошибка при обработке сброса пароля');
+      throw new InternalServerErrorException(
+        'Ошибка при обработке сброса пароля',
+      );
     }
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     try {
       const { token, newPassword } = resetPasswordDto;
-      
+
       const user = await this.userModel.findOne({
         resetPasswordToken: token,
         resetPasswordExpires: { $gt: Date.now() },
       });
 
       if (!user) {
-        throw new BadRequestException('Недействительный или просроченный токен');
+        throw new BadRequestException(
+          'Недействительный или просроченный токен',
+        );
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-      
+
       user.password = hashedPassword;
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;

@@ -8,7 +8,6 @@ async function start() {
   const PORT = process.env.PORT;
   const app = await NestFactory.create(AppModule);
 
-  // Включаем валидацию
   app.useGlobalPipes(new ValidationPipe());
   app.use(
     session({

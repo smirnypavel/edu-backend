@@ -1,18 +1,19 @@
 /* eslint-disable prettier/prettier */
-import { 
-  Controller, 
-  Post, 
-  Body, 
-  Get, 
-  UseGuards, 
-  Req, 
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Req,
   HttpStatus,
   HttpCode,
+  Res,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
   ApiBody,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
@@ -71,8 +72,11 @@ export class AuthController {
     status: 200,
     description: 'Google authentication successful',
   })
-  async googleAuthCallback(@Req() req) {
-    return this.authService.googleLogin(req.user);
+  async googleAuthCallback(@Req() req: any, @Res() res: any) {
+    const user = await this.authService.googleLogin(req.user);
+    return res.redirect(
+      `${process.env.FRONTEND_URL}?token=${user.access_token}&firstName=${user.user.firstName}&lastName=${user.user.lastName}`,
+    );
   }
 
   @Post('forgot-password')
@@ -121,4 +125,3 @@ export class AuthController {
     return req.user;
   }
 }
-

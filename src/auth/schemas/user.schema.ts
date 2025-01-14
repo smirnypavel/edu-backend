@@ -9,7 +9,11 @@ export class EnrolledCourse {
   @Prop({ type: MongooseSchema.Types.ObjectId, required: true })
   courseId: MongooseSchema.Types.ObjectId;
 
-  @ApiProperty({ description: 'Процент прохождения курса', minimum: 0, maximum: 100 })
+  @ApiProperty({
+    description: 'Процент прохождения курса',
+    minimum: 0,
+    maximum: 100,
+  })
   @Prop({ default: 0, min: 0, max: 100 })
   progress: number;
 
@@ -48,7 +52,10 @@ export class Payment {
   @Prop({ required: true })
   currency: string;
 
-  @ApiProperty({ description: 'Статус платежа', enum: ['pending', 'completed', 'failed'] })
+  @ApiProperty({
+    description: 'Статус платежа',
+    enum: ['pending', 'completed', 'failed'],
+  })
   @Prop({ required: true, enum: ['pending', 'completed', 'failed'] })
   status: string;
 
@@ -68,7 +75,7 @@ export class User extends Document {
   password: string;
 
   @ApiProperty({ description: 'Google ID для OAuth', required: false })
-  @Prop()
+  @Prop({ required: false, default: null })
   googleId?: string;
 
   @ApiProperty({ description: 'Имя пользователя' })
@@ -83,7 +90,11 @@ export class User extends Document {
   @Prop()
   avatar?: string;
 
-  @ApiProperty({ description: 'Роль пользователя', enum: ['user', 'admin'], default: 'user' })
+  @ApiProperty({
+    description: 'Роль пользователя',
+    enum: ['user', 'admin'],
+    default: 'user',
+  })
   @Prop({ required: true, enum: ['user', 'admin'], default: 'user' })
   role: string;
 
@@ -95,7 +106,10 @@ export class User extends Document {
   @Prop()
   resetPasswordToken?: string;
 
-  @ApiProperty({ description: 'Срок действия токена сброса пароля', required: false })
+  @ApiProperty({
+    description: 'Срок действия токена сброса пароля',
+    required: false,
+  })
   @Prop()
   resetPasswordExpires?: Date;
 
@@ -107,7 +121,10 @@ export class User extends Document {
   @Prop()
   lockUntil?: Date;
 
-  @ApiProperty({ description: 'Список курсов пользователя', type: [EnrolledCourse] })
+  @ApiProperty({
+    description: 'Список курсов пользователя',
+    type: [EnrolledCourse],
+  })
   @Prop({ type: [EnrolledCourse], default: [] })
   enrolledCourses: EnrolledCourse[];
 

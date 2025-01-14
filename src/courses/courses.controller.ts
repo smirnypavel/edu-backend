@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Req,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -23,6 +24,9 @@ import {
 import { CreateCourseDto } from './dto/create.course.dto';
 import { CreateLessonDto } from './dto/create.lesson.dto';
 import { TestSubmissionDto } from './dto/test.dto';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/auth/decorators/roles.enum';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/role.guard';
 
 @ApiTags('Courses')
@@ -33,14 +37,24 @@ export class CoursesController {
   constructor(private coursesService: CoursesService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create a new course' })
-  createCourse(@Req() req, @Body() createCourseDto: CreateCourseDto) {
-    console.log(req.user);
-    return this.coursesService.createCourse({
-      ...createCourseDto,
-      author: req.user._id,
-    });
+  @ApiResponse({ status: 201, description: 'Course created successfully' })
+  async createCourse(
+    @Req() req: any,
+    @Body() createCourseDto: CreateCourseDto,
+  ) {
+    try {
+      return await this.coursesService.createCourse({
+        ...createCourseDto,
+        author: req.user._id,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to create course: ${error.message}`,
+      );
+    }
   }
 
   @Get()
