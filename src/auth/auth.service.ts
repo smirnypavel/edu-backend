@@ -29,7 +29,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     try {
-      const { email, password } = registerDto;
+      const { email, password, firstName, lastName } = registerDto;
 
       const existingUser = await this.userModel.findOne({ email });
       if (existingUser) {
@@ -38,11 +38,16 @@ export class AuthService {
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = new this.userModel({
-        ...registerDto,
+        email,
+        firstName,
+        lastName,
         password: hashedPassword,
       });
 
-      await user.save();
+      await user.save().catch((error) => {
+        this.logger.error(`Ошибка сохранения пользователя: ${error.message}`);
+        throw new BadRequestException('Неверные данные пользователя');
+      });
 
       const token = this.jwtService.sign({ email });
       await this.mailService.sendVerificationEmail(email, token);

@@ -68,6 +68,7 @@ export class CreateCourseDto {
     description: 'Список уроков',
     type: [CreateLessonDto],
     isArray: true,
+    default: [],
   })
   @IsArray()
   lessons: CreateLessonDto[];

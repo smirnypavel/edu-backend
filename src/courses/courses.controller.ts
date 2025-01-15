@@ -24,10 +24,10 @@ import {
 import { CreateCourseDto } from './dto/create.course.dto';
 import { CreateLessonDto } from './dto/create.lesson.dto';
 import { TestSubmissionDto } from './dto/test.dto';
-import { Roles } from 'src/auth/decorators/role.decorator';
-import { UserRole } from 'src/auth/decorators/roles.enum';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from './../auth/decorators/role.decorator';
+import { UserRole } from './../auth/decorators/roles.enum';
+import { JwtAuthGuard } from './../auth/guards/jwt-auth.guard';
+import { RolesGuard } from './../auth/guards/role.guard';
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -37,7 +37,7 @@ export class CoursesController {
   constructor(private coursesService: CoursesService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN || UserRole.TEACHER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create a new course' })
   @ApiResponse({ status: 201, description: 'Course created successfully' })
@@ -58,18 +58,21 @@ export class CoursesController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all courses' })
   getCourses(@Query() filters: any) {
     return this.coursesService.getCourses(filters);
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get course by ID' })
   getCourseById(@Param('id') id: string) {
     return this.coursesService.getCourseById(id);
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMIN || UserRole.TEACHER)
   @ApiOperation({ summary: 'Update course' })
   updateCourse(
     @Param('id') id: string,
@@ -79,6 +82,7 @@ export class CoursesController {
   }
 
   @Post(':courseId/lessons')
+  @Roles(UserRole.ADMIN || UserRole.TEACHER)
   @ApiOperation({ summary: 'Add lesson to course' })
   addLesson(
     @Param('courseId') courseId: string,
@@ -88,11 +92,12 @@ export class CoursesController {
   }
 
   @Put(':courseId/lessons/:lessonId')
+  @Roles(UserRole.ADMIN || UserRole.TEACHER)
   @ApiOperation({ summary: 'Update lesson' })
   updateLesson(
     @Param('courseId') courseId: string,
     @Param('lessonId') lessonId: string,
-    @Body() updateLessonDto: Partial<CreateLessonDto>,
+    @Body() updateLessonDto: CreateLessonDto,
   ) {
     return this.coursesService.updateLesson(
       courseId,

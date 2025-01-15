@@ -108,7 +108,7 @@ export class CoursesService {
   async updateLesson(
     courseId: string,
     lessonId: string,
-    lessonDto: Partial<CreateLessonDto>,
+    lessonDto: CreateLessonDto,
   ): Promise<Course> {
     try {
       const course = await this.courseModel.findById(courseId);

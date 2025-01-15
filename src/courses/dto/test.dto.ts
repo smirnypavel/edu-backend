@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNumber, ValidateNested, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class TestAnswer {
+export class TestAnswer {
   @ApiProperty({ description: 'ID вопроса' })
   @IsString()
   questionId: string;
