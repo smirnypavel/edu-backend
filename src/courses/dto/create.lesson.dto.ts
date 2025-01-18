@@ -1,33 +1,39 @@
 /* eslint-disable prettier/prettier */
-import { IsString, IsNumber, IsArray, IsOptional, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsArray,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 class CodeExerciseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Язык программирования',
-    example: 'javascript' 
+    example: 'javascript',
   })
   @IsString()
   language: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Начальный код',
-    example: 'function sum(a, b) {\n  // your code here\n}' 
+    example: 'function sum(a, b) {\n  // your code here\n}',
   })
   @IsString()
   initialCode: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Решение задачи',
-    example: 'function sum(a, b) {\n  return a + b;\n}' 
+    example: 'function sum(a, b) {\n  return a + b;\n}',
   })
   @IsString()
   solution: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Тесты для проверки',
-    example: ['test("sum(2, 2) should return 4", () => {...}']
+    example: ['test("sum(2, 2) should return 4", () => {...}'],
   })
   @IsArray()
   @IsString({ each: true })
@@ -35,88 +41,88 @@ class CodeExerciseDto {
 }
 
 class TestDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Вопрос теста',
-    example: 'Что такое JavaScript?' 
+    example: 'Что такое JavaScript?',
   })
   @IsString()
   question: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Варианты ответов',
-    example: ['Язык программирования', 'База данных', 'Операционная система']
+    example: ['Язык программирования', 'База данных', 'Операционная система'],
   })
   @IsArray()
   @IsString({ each: true })
   options: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Правильный ответ',
-    example: 'Язык программирования' 
+    example: 'Язык программирования',
   })
   @IsString()
   correctAnswer: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Количество баллов за вопрос',
-    example: 10 
+    example: 10,
   })
   @IsNumber()
   points: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ограничение по времени в секундах',
-    example: 300 
+    example: 300,
   })
   @IsNumber()
   timeLimit: number;
 }
 
 export class CreateLessonDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Название урока',
-    example: 'Введение в JavaScript' 
+    example: 'Введение в JavaScript',
   })
   @IsString()
   title: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Порядковый номер урока',
-    example: 1 
+    example: 1,
   })
   @IsNumber()
   order: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Контент урока в формате Markdown',
-    example: '# Введение\nВ этом уроке мы изучим основы JavaScript...' 
+    example: '# Введение\nВ этом уроке мы изучим основы JavaScript...',
   })
   @IsString()
   content: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ссылки на изображения',
     example: ['https://example.com/image1.jpg'],
-    required: false
+    required: false,
   })
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
   images?: string[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Ссылка на видео',
     example: 'https://youtube.com/watch?v=...',
-    required: false
+    required: false,
   })
   @IsString()
   @IsOptional()
   videoUrl?: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Упражнения по программированию',
     type: [CodeExerciseDto],
-    required: false
+    required: false,
   })
   @IsArray()
   @IsOptional()
@@ -124,10 +130,10 @@ export class CreateLessonDto {
   @Type(() => CodeExerciseDto)
   codeExercises?: CodeExerciseDto[];
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: 'Тесты',
     type: [TestDto],
-    required: false
+    required: false,
   })
   @IsArray()
   @IsOptional()

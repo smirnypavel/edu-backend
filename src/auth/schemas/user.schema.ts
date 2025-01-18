@@ -122,11 +122,18 @@ export class User extends Document {
   lockUntil?: Date;
 
   @ApiProperty({
-    description: 'Список курсов пользователя',
+    description: 'Список активных курсов пользователя',
     type: [EnrolledCourse],
   })
   @Prop({ type: [EnrolledCourse], default: [] })
   enrolledCourses: EnrolledCourse[];
+
+  @ApiProperty({
+    description: 'Список доступных курсов пользователя',
+    type: [MongooseSchema.Types.ObjectId],
+  })
+  @Prop({ type: [MongooseSchema.Types.ObjectId], default: [] })
+  availableCourses: [];
 
   @ApiProperty({ description: 'История платежей', type: [Payment] })
   @Prop({ type: [Payment], default: [] })

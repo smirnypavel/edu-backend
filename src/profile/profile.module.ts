@@ -3,17 +3,13 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
-import { UserSchema } from '../auth/schemas/user.schema';
-import { CourseSchema } from '../courses/schemas/course.schema';
+import { User, UserSchema } from '../auth/schemas/user.schema';
+import { Course, CourseSchema } from '../courses/schemas/course.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: 'User', schema: UserSchema }
-    ]),
-    MongooseModule.forFeature([
-      { name: 'Course', schema: CourseSchema}
-    ]),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Course.name, schema: CourseSchema }]),
   ],
   controllers: [ProfileController],
   providers: [ProfileService],
