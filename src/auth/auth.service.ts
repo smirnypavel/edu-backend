@@ -74,7 +74,9 @@ export class AuthService {
       }
 
       if (user.lockUntil && user.lockUntil > new Date()) {
-        throw new UnauthorizedException('Аккаунт временно заблокирован');
+        throw new UnauthorizedException(
+          'Аккаунт временно заблокирован администратором',
+        );
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
