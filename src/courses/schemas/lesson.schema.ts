@@ -27,12 +27,14 @@ export class Lesson extends Document {
 
   @ApiProperty({ description: 'Упражнения по программированию' })
   @Prop({
-    type: [{
-      language: String,
-      initialCode: String,
-      solution: String,
-      tests: [String],
-    }]
+    type: [
+      {
+        language: String,
+        initialCode: String,
+        solution: String,
+        tests: [String],
+      },
+    ],
   })
   codeExercises: Array<{
     language: string;
@@ -43,15 +45,18 @@ export class Lesson extends Document {
 
   @ApiProperty({ description: 'Тесты' })
   @Prop({
-    type: [{
-      question: String,
-      options: [String],
-      correctAnswer: String,
-      points: Number,
-      timeLimit: Number,
-    }]
+    type: [
+      {
+        question: String,
+        options: [String],
+        correctAnswer: String,
+        points: Number,
+        timeLimit: Number,
+      },
+    ],
   })
   tests: Array<{
+    _id: any;
     question: string;
     options: string[];
     correctAnswer: string;

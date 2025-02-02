@@ -1,6 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Put, Body, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -20,7 +25,7 @@ export class ProfileController {
   }
 
   @Get('courses')
-  @ApiOperation({ summary: 'Получить список доступных курсов' })
+  @ApiOperation({ summary: 'Получить список опубликованных курсов' })
   async getCourses(@Req() req) {
     return this.profileService.getCourses(req.user._id);
   }

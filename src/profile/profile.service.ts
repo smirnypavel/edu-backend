@@ -55,8 +55,14 @@ export class ProfileService {
       );
 
       const [availableCourses, enrolledCourses] = await Promise.all([
-        this.courseModel.find({ _id: { $nin: enrolledCourseIds } }),
-        this.courseModel.find({ _id: { $in: enrolledCourseIds } }),
+        this.courseModel.find({
+          _id: { $nin: enrolledCourseIds },
+          status: 'published',
+        }),
+        this.courseModel.find({
+          _id: { $in: enrolledCourseIds },
+          status: 'published',
+        }),
       ]);
 
       return { available: availableCourses, enrolled: enrolledCourses };
