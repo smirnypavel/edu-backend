@@ -1,24 +1,15 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
+import axios from 'axios';
 import { Model } from 'mongoose';
-import OpenAI from 'openai';
 import { Lesson } from 'src/courses/schemas/lesson.schema';
 
 @Injectable()
 export class AiService {
-  private readonly openai: OpenAI;
   private readonly logger = new Logger(AiService.name);
 
-  constructor(
-    @InjectModel(Lesson.name) private lessonModel: Model<Lesson>,
-    private configService: ConfigService,
-  ) {
-    this.openai = new OpenAI({
-      apiKey: this.configService.get<string>(process.env.OPENAI_API_KEY),
-    });
-  }
+  constructor(@InjectModel(Lesson.name) private lessonModel: Model<Lesson>) {}
 
   async checkCode(data: {
     code: string;
@@ -49,16 +40,15 @@ export class AiService {
         Пожалуйста, используйте технические термины на русском языке.
       `;
 
-      const completion = await this.openai.chat.completions.create({
-        model: process.env.AI_MODEL,
-        messages: [{ role: 'user', content: prompt }],
+      const completion = await axios.post(process.env.OLLAMA_SERVER_URL, {
+        model: process.env.OLLAMA_MODEL,
+        prompt: prompt,
+        stream: false,
       });
 
       return {
-        analysis: completion.choices[0].message.content,
-        passed: this.determineTestsPassed(
-          completion.choices[0].message.content,
-        ),
+        analysis: completion.data.response,
+        passed: this.determineTestsPassed(completion.data.response),
       };
     } catch (error) {
       this.logger.error(`Error checking code: ${error.message}`);
@@ -92,13 +82,14 @@ export class AiService {
         !Важно: не раскрывать готовое решение
 `;
 
-      const completion = await this.openai.chat.completions.create({
-        model: process.env.AI_MODEL,
-        messages: [{ role: 'user', content: prompt }],
+      const completion = await axios.post(process.env.OLLAMA_SERVER_URL, {
+        model: process.env.OLLAMA_MODEL,
+        prompt: prompt,
+        stream: false,
       });
 
       return {
-        hint: completion.choices[0].message.content,
+        hint: completion.data.response,
       };
     } catch (error) {
       this.logger.error(`Error generating hint: ${error.message}`);
@@ -149,14 +140,14 @@ export class AiService {
     numberOfQuestions: number;
   }) {
     try {
-      const lesson = await this.lessonModel.findById(data.lessonId);
-      if (!lesson) {
-        throw new Error('Lesson not found');
-      }
+      // const lesson = await this.lessonModel.findById(data.lessonId);
+      // if (!lesson) {
+      //   throw new Error('Lesson not found');
+      // }
 
       const prompt = `
         На основе содержания урока:
-        ${lesson.content}
+        ${data.lessonId}
         
         Сгенерируйте ${data.numberOfQuestions} вопросов с множественным выбором 
         уровня сложности "${data.difficulty}".
@@ -182,14 +173,13 @@ export class AiService {
         - Сложность должна соответствовать уровню ${data.difficulty}
       `;
 
-      const completion = await this.openai.chat.completions.create({
-        model: process.env.AI_MODEL,
-        messages: [{ role: 'user', content: prompt }],
+      const completion = await axios.post(process.env.OLLAMA_SERVER_URL, {
+        model: process.env.OLLAMA_MODEL,
+        prompt: prompt,
+        stream: false,
       });
 
-      const generatedQuestions = JSON.parse(
-        completion.choices[0].message.content,
-      );
+      const generatedQuestions = completion.data.response;
       return generatedQuestions;
     } catch (error) {
       this.logger.error(`Error generating test: ${error.message}`);
