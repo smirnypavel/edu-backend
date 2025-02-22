@@ -39,7 +39,7 @@ export class CoursesController {
   @Post()
   @Roles(UserRole.ADMIN || UserRole.TEACHER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiOperation({ summary: 'Create a new course' })
+  @ApiOperation({ summary: 'Создание нового курса' })
   @ApiResponse({ status: 201, description: 'Course created successfully' })
   async createCourse(
     @Req() req: any,
@@ -59,21 +59,21 @@ export class CoursesController {
 
   @Get()
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get all courses' })
-  getCourses(@Query() filters: any) {
-    return this.coursesService.getCourses(filters);
+  @ApiOperation({ summary: 'Получить все опубликованые курсы' })
+  getCourses() {
+    return this.coursesService.getCourses();
   }
 
   @Get(':id')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get course by ID' })
+  @ApiOperation({ summary: 'Получить курс по ID' })
   getCourseById(@Param('id') id: string) {
     return this.coursesService.getCourseById(id);
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN || UserRole.TEACHER)
-  @ApiOperation({ summary: 'Update course' })
+  @ApiOperation({ summary: 'Обновить курс' })
   updateCourse(
     @Param('id') id: string,
     @Body() updateCourseDto: Partial<CreateCourseDto>,
@@ -83,7 +83,7 @@ export class CoursesController {
 
   @Post(':courseId/lessons')
   @Roles(UserRole.ADMIN || UserRole.TEACHER)
-  @ApiOperation({ summary: 'Add lesson to course' })
+  @ApiOperation({ summary: 'Создать урок' })
   addLesson(
     @Param('courseId') courseId: string,
     @Body() createLessonDto: CreateLessonDto,
@@ -91,44 +91,44 @@ export class CoursesController {
     return this.coursesService.addLesson(courseId, createLessonDto);
   }
 
-  @Put(':courseId/lessons/:lessonId')
-  @Roles(UserRole.ADMIN || UserRole.TEACHER)
-  @ApiOperation({ summary: 'Update lesson' })
-  updateLesson(
-    @Param('courseId') courseId: string,
-    @Param('lessonId') lessonId: string,
-    @Body() updateLessonDto: CreateLessonDto,
-  ) {
-    return this.coursesService.updateLesson(
-      courseId,
-      lessonId,
-      updateLessonDto,
-    );
-  }
+  // @Put(':courseId/lessons/:lessonId')
+  // @Roles(UserRole.ADMIN || UserRole.TEACHER)
+  // @ApiOperation({ summary: 'Обновить урок' })
+  // updateLesson(
+  //   @Param('courseId') courseId: string,
+  //   @Param('lessonId') lessonId: string,
+  //   @Body() updateLessonDto: CreateLessonDto,
+  // ) {
+  //   return this.coursesService.updateLesson(
+  //     courseId,
+  //     lessonId,
+  //     updateLessonDto,
+  //   );
+  // }
 
-  @Post(':courseId/lessons/:lessonId/code')
-  @ApiOperation({ summary: 'Evaluate code submission' })
-  evaluateCode(
-    @Param('courseId') courseId: string,
-    @Param('lessonId') lessonId: string,
-    @Body() submission: { code: string; language: string },
-  ) {
-    return this.coursesService.evaluateCode(courseId, lessonId, submission);
-  }
-  @Post(':courseId/lessons/:lessonId/test')
-  @ApiOperation({ summary: 'Оценка теста' })
-  @ApiResponse({ status: 200, description: 'Тест успешно оценен' })
-  @ApiBadRequestResponse({ description: 'Некорректные данные' })
-  @ApiNotFoundResponse({ description: 'Курс или урок не найден' })
-  async evaluateTest(
-    @Param('courseId') courseId: string,
-    @Param('lessonId') lessonId: string,
-    @Body() submission: TestSubmissionDto,
-  ) {
-    return await this.coursesService.evaluateTest(
-      courseId,
-      lessonId,
-      submission,
-    );
-  }
+  // @Post(':courseId/lessons/:lessonId/code')
+  // @ApiOperation({ summary: 'Оценка задания' })
+  // evaluateCode(
+  //   @Param('courseId') courseId: string,
+  //   @Param('lessonId') lessonId: string,
+  //   @Body() submission: { code: string; language: string },
+  // ) {
+  //   return this.coursesService.evaluateCode(courseId, lessonId, submission);
+  // }
+  // @Post(':courseId/lessons/:lessonId/test')
+  // @ApiOperation({ summary: 'Оценка теста' })
+  // @ApiResponse({ status: 200, description: 'Тест успешно оценен' })
+  // @ApiBadRequestResponse({ description: 'Некорректные данные' })
+  // @ApiNotFoundResponse({ description: 'Курс или урок не найден' })
+  // async evaluateTest(
+  //   @Param('courseId') courseId: string,
+  //   @Param('lessonId') lessonId: string,
+  //   @Body() submission: TestSubmissionDto,
+  // ) {
+  //   return await this.coursesService.evaluateTest(
+  //     courseId,
+  //     lessonId,
+  //     submission,
+  //   );
+  // }
 }

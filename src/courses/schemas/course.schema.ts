@@ -35,7 +35,11 @@ export class Course extends Document {
   tags: string[];
 
   @ApiProperty({ description: 'Уроки курса' })
-  @Prop({ type: [Lesson], required: true })
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Lesson' }],
+    required: false,
+    default: [],
+  })
   lessons: Lesson[];
 
   @ApiProperty({ description: 'Автор курса' })

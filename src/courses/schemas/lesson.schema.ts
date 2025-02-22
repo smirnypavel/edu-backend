@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Schema({ timestamps: true })
@@ -13,7 +13,7 @@ export class Lesson extends Document {
   @Prop({ required: true })
   order: number;
 
-  @ApiProperty({ description: 'Контент урока в формате Markdown' })
+  @ApiProperty({ description: 'Контент урока' })
   @Prop({ required: true })
   content: string;
 
@@ -32,37 +32,22 @@ export class Lesson extends Document {
         language: String,
         initialCode: String,
         solution: String,
-        tests: [String],
       },
     ],
+    default: [],
   })
   codeExercises: Array<{
     language: string;
     initialCode: string;
     solution: string;
-    tests: string[];
   }>;
 
   @ApiProperty({ description: 'Тесты' })
   @Prop({
-    type: [
-      {
-        question: String,
-        options: [String],
-        correctAnswer: String,
-        points: Number,
-        timeLimit: Number,
-      },
-    ],
+    type: [MongooseSchema.Types.ObjectId],
+    default: [],
   })
-  tests: Array<{
-    _id: any;
-    question: string;
-    options: string[];
-    correctAnswer: string;
-    points: number;
-    timeLimit: number;
-  }>;
+  tests: MongooseSchema.Types.ObjectId[];
 }
 
 export const LessonSchema = SchemaFactory.createForClass(Lesson);

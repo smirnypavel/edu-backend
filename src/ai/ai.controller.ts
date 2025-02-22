@@ -127,53 +127,53 @@ export class AiController {
     return this.aiService.generateHint(data);
   }
 
-  @Post('evaluate-test')
-  @ApiOperation({
-    summary: 'Оценка ответов теста',
-    description: 'Проверяет ответы на тест и возвращает результаты оценки',
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        testId: {
-          type: 'string',
-          description: 'ID теста',
-        },
-        answers: {
-          type: 'array',
-          description: 'Массив ответов на вопросы',
-          items: {
-            type: 'object',
-            properties: {
-              questionId: { type: 'string' },
-              answer: { type: 'string' },
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Результаты оценки теста',
-    schema: {
-      type: 'object',
-      properties: {
-        score: { type: 'number' },
-        feedback: { type: 'string' },
-      },
-    },
-  })
-  async evaluateTest(
-    @Body()
-    data: {
-      testId: string;
-      answers: { questionId: string; answer: string }[];
-    },
-  ) {
-    return this.aiService.evaluateTest(data);
-  }
+  // @Post('evaluate-test')
+  // @ApiOperation({
+  //   summary: 'Оценка ответов теста',
+  //   description: 'Проверяет ответы на тест и возвращает результаты оценки',
+  // })
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       testId: {
+  //         type: 'string',
+  //         description: 'ID теста',
+  //       },
+  //       answers: {
+  //         type: 'array',
+  //         description: 'Массив ответов на вопросы',
+  //         items: {
+  //           type: 'object',
+  //           properties: {
+  //             questionId: { type: 'string' },
+  //             answer: { type: 'string' },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Результаты оценки теста',
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       score: { type: 'number' },
+  //       feedback: { type: 'string' },
+  //     },
+  //   },
+  // })
+  // async evaluateTest(
+  //   @Body()
+  //   data: {
+  //     testId: string;
+  //     answers: { questionId: string; answer: string }[];
+  //   },
+  // ) {
+  //   return this.aiService.evaluateTest(data);
+  // }
 
   @Post('generate-test')
   @ApiOperation({

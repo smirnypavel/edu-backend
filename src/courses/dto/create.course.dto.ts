@@ -7,7 +7,6 @@ import {
   IsEnum,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateLessonDto } from './create.lesson.dto';
 
 export class CreateCourseDto {
   @ApiProperty({
@@ -63,13 +62,4 @@ export class CreateCourseDto {
   @IsArray()
   @IsString({ each: true })
   tags: string[];
-
-  @ApiProperty({
-    description: 'Список уроков',
-    type: [CreateLessonDto],
-    isArray: true,
-    default: [],
-  })
-  @IsArray()
-  lessons: CreateLessonDto[];
 }

@@ -97,42 +97,42 @@ export class AiService {
     }
   }
 
-  async evaluateTest(data: {
-    testId: string;
-    answers: { questionId: string; answer: string }[];
-  }) {
-    try {
-      const test = await this.lessonModel
-        .findOne({ 'tests._id': data.testId })
-        .select('tests');
+  // async evaluateTest(data: {
+  //   testId: string;
+  //   answers: { questionId: string; answer: string }[];
+  // }) {
+  //   try {
+  //     const test = await this.lessonModel
+  //       .findOne({ 'tests._id': data.testId })
+  //       .select('tests');
 
-      if (!test) {
-        throw new Error('Test not found');
-      }
+  //     if (!test) {
+  //       throw new Error('Test not found');
+  //     }
 
-      const results = data.answers.map((answer) => {
-        const question = test.tests.find(
-          (q) => q._id.toString() === answer.questionId,
-        );
-        return {
-          questionId: answer.questionId,
-          correct: question.correctAnswer === answer.answer,
-          points:
-            question.correctAnswer === answer.answer ? question.points : 0,
-        };
-      });
+  //     const results = data.answers.map((answer) => {
+  //       const question = test.tests.find(
+  //         (q) => q._id.toString() === answer.questionId,
+  //       );
+  //       return {
+  //         questionId: answer.questionId,
+  //         correct: question.correctAnswer === answer.answer,
+  //         points:
+  //           question.correctAnswer === answer.answer ? question.points : 0,
+  //       };
+  //     });
 
-      return {
-        results,
-        totalPoints: results.reduce((sum, result) => sum + result.points, 0),
-        totalQuestions: results.length,
-        passedQuestions: results.filter((r) => r.correct).length,
-      };
-    } catch (error) {
-      this.logger.error(`Error evaluating test: ${error.message}`);
-      throw error;
-    }
-  }
+  //     return {
+  //       results,
+  //       totalPoints: results.reduce((sum, result) => sum + result.points, 0),
+  //       totalQuestions: results.length,
+  //       passedQuestions: results.filter((r) => r.correct).length,
+  //     };
+  //   } catch (error) {
+  //     this.logger.error(`Error evaluating test: ${error.message}`);
+  //     throw error;
+  //   }
+  // }
 
   async generateTest(data: {
     lessonId: string;
