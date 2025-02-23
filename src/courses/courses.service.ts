@@ -11,7 +11,9 @@ import { Course } from './schemas/course.schema';
 import { CreateCourseDto } from './dto/create.course.dto';
 import { CreateLessonDto } from './dto/create.lesson.dto';
 import { Lesson } from './schemas/lesson.schema';
-
+import { UpdateLessonDto } from './dto/update.lesson.dto';
+import { Tests } from './schemas/test.schema';
+import { Schema as MongooseSchema } from 'mongoose';
 @Injectable()
 export class CoursesService {
   private readonly logger = new Logger(CoursesService.name);
@@ -19,6 +21,7 @@ export class CoursesService {
   constructor(
     @InjectModel(Course.name) private courseModel: Model<Course>,
     @InjectModel(Lesson.name) private lessonModel: Model<Lesson>,
+    @InjectModel(Tests.name) private testModel: Model<Tests>,
   ) {}
 
   async createCourse(
@@ -110,21 +113,75 @@ export class CoursesService {
     }
   }
 
-  async updateLesson(lessonId: string, data: CreateLessonDto): Promise<Lesson> {
+  async getLessonById(lessonId: string): Promise<Lesson> {
     try {
       const lesson = await this.lessonModel.findById(lessonId);
       if (!lesson) {
         throw new NotFoundException('Урок не найден');
       }
-      await lesson.updateOne(data);
+      return lesson;
+    } catch (error) {
+      this.logger.error(`Ошибка получения урока: ${error.message}`);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Ошибка при получении урока');
+    }
+  }
 
-      return await lesson.save();
+  async updateLesson(lessonId: string, data: UpdateLessonDto): Promise<Lesson> {
+    try {
+      const lesson = await this.lessonModel.findById(lessonId);
+      if (!lesson) {
+        throw new NotFoundException('Урок не найден');
+      }
+      const updateData: Partial<UpdateLessonDto> = {};
+
+      if (data.title !== undefined) updateData.title = data.title;
+      if (data.order !== undefined) updateData.order = data.order;
+      if (data.content !== undefined) updateData.content = data.content;
+      if (data.images !== undefined) updateData.images = data.images;
+      if (data.videoUrl !== undefined) updateData.videoUrl = data.videoUrl;
+      if (data.codeExercises !== undefined)
+        updateData.codeExercises = data.codeExercises;
+      if (data.tests !== undefined) updateData.tests = data.tests;
+
+      const updatedLesson = await this.lessonModel.findByIdAndUpdate(
+        lessonId,
+        { $set: updateData },
+        { new: true, runValidators: true },
+      );
+
+      if (!updatedLesson) {
+        throw new NotFoundException('Урок не найден после обновления');
+      }
+
+      return updatedLesson;
     } catch (error) {
       this.logger.error(`Ошибка обновления урока: ${error.message}`);
       if (error instanceof NotFoundException) {
         throw error;
       }
       throw new InternalServerErrorException('Ошибка при обновлении урока');
+    }
+  }
+
+  async addTest(lessonId: string, test: any): Promise<Tests> {
+    try {
+      const lesson = await this.lessonModel.findById(lessonId);
+      if (!lesson) {
+        throw new NotFoundException('Урок не найден');
+      }
+      const newTest = await this.testModel.create(test);
+      lesson.tests.push(newTest._id as MongooseSchema.Types.ObjectId);
+      await lesson.save();
+      return newTest;
+    } catch (error) {
+      this.logger.error(`Ошибка добавления теста: ${error.message}`);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Ошибка при добавлении теста');
     }
   }
 

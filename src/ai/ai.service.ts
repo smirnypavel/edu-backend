@@ -140,14 +140,14 @@ export class AiService {
     numberOfQuestions: number;
   }) {
     try {
-      // const lesson = await this.lessonModel.findById(data.lessonId);
-      // if (!lesson) {
-      //   throw new Error('Lesson not found');
-      // }
+      const lesson = await this.lessonModel.findById(data.lessonId);
+      if (!lesson) {
+        throw new Error('Lesson not found');
+      }
 
       const prompt = `
         На основе содержания урока:
-        ${data.lessonId}
+        ${lesson.content}
         
         Сгенерируйте ${data.numberOfQuestions} вопросов с множественным выбором 
         уровня сложности "${data.difficulty}".

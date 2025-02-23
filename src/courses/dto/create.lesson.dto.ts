@@ -9,7 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-class CodeExerciseDto {
+export class CodeExerciseDto {
   @ApiProperty({
     description: 'Язык программирования',
     example: 'javascript',
@@ -40,7 +40,7 @@ class CodeExerciseDto {
   tests: string[];
 }
 
-class TestDto {
+export class TestDto {
   @ApiProperty({
     description: 'Вопрос теста',
     example: 'Что такое JavaScript?',

@@ -1,26 +1,74 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNumber, ValidateNested, IsString } from 'class-validator';
+import {
+  IsString,
+  IsArray,
+  IsNumber,
+  ValidateNested,
+  Min,
+  ArrayMinSize,
+  IsMongoId,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class TestAnswer {
-  @ApiProperty({ description: 'ID вопроса' })
+export class TestQuestionDto {
+  @ApiProperty({
+    description: 'Вопрос теста',
+    example: 'Что такое JavaScript?',
+  })
   @IsString()
-  questionId: string;
+  question: string;
 
-  @ApiProperty({ description: 'Ответ пользователя' })
+  @ApiProperty({
+    description: 'Варианты ответов',
+    example: ['Язык программирования', 'База данных', 'Операционная система'],
+  })
+  @IsArray()
+  @ArrayMinSize(2, { message: 'Минимум 2 варианта ответа' })
+  @IsString({ each: true })
+  options: string[];
+
+  @ApiProperty({
+    description: 'Правильный ответ',
+    example: 'Язык программирования',
+  })
   @IsString()
-  answer: string;
+  correctAnswer: string;
+
+  @ApiProperty({
+    description: 'Количество баллов за вопрос',
+    example: 10,
+    minimum: 1,
+  })
+  @IsNumber()
+  @Min(1)
+  points: number;
+
+  @ApiProperty({
+    description: 'Ограничение по времени в секундах',
+    example: 300,
+    minimum: 30,
+  })
+  @IsNumber()
+  @Min(30)
+  timeLimit: number;
 }
 
-export class TestSubmissionDto {
-  @ApiProperty({ description: 'Массив ответов на вопросы', type: [TestAnswer] })
+export class CreateTestDto {
+  @ApiProperty({
+    description: 'ID урока',
+    example: '507f1f77bcf86cd799439011',
+  })
+  @IsMongoId()
+  lessonId: string;
+
+  @ApiProperty({
+    description: 'Массив тестовых вопросов',
+    type: [TestQuestionDto],
+  })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => TestAnswer)
-  answers: TestAnswer[];
-
-  @ApiProperty({ description: 'Время выполнения теста в секундах' })
-  @IsNumber()
-  timeTaken: number;
+  @ArrayMinSize(1, { message: 'Тест должен содержать минимум 1 вопрос' })
+  @Type(() => TestQuestionDto)
+  tests: TestQuestionDto[];
 }
